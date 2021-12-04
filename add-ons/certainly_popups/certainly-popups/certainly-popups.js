@@ -2,14 +2,6 @@ const CURRENT_URL = window.location.href;
 const CURRENT_DEVICE_TYPE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile": "desktop";
 let popups;
 
-// Inits the Certainly Widget and passes the necessary callback functions
-initCertainlyWidget(
-	certainly_config,
-	function(){
-		certainly.minimize();
-		certainly.checkPopups();
-	}
-);
 
 
 // Debug utility function
@@ -21,12 +13,12 @@ certainly.trace = function (message){
 }
 
 // Method that mazimized the Certainly Widget
-certainly.open = function(){
+certainly.open = function(callback){
 	certainly.widgetStatus(
 		{
 			action: "open",
 			webchatKey: certainly_config.webchatKey
-		}
+		}, callback
 	)
 }
 
@@ -40,10 +32,11 @@ certainly.minimize = function(){
 	)
 }
 
+                                   
+
 // Method that inits popups
 certainly.initPopups = function(messages, trigger = "page_load", delay = 1000){
 	delay = delay < 1000 ? 1000 : delay;
-	console.log(messages,trigger,delay)
 	if (trigger == "page_load"){
 		setTimeout(() => {certainly.renderPopups(messages)}, delay);
 	}
@@ -62,28 +55,35 @@ certainly.renderPopups = function(messages){
 		document.querySelector(`#botxo-chat-${certainly_config.webchatKey}`).
 		insertAdjacentHTML('afterbegin', `<div id="certainly-popups-container">
 				<ul id="certainly-popups">
-					<div id="certainly-popups-close">X</div>
+					<div id="certainly-popups-close" style="display:none;">X</div>
 				</ul>
 			</div>`);
 		document.querySelector("#certainly-popups-close").addEventListener("click", function() {
 			certainly.destroyPopups()
 		}); 
-}
+	}
+	certainly.trace("Rendering popups");
 	for (let i = 0; i < messages.length; i++) {
-		setTimeout(function() { 
-			certainly.trace("Rendering popups");
-			var message_html = `<li class="certainly-message">
-					<div class="certainly-bubble" title="Chatbot wrote: ${messages[i]}">${messages[i]}</div>
-				</li>`;
-			document.querySelector("#certainly-popups").insertAdjacentHTML('beforeend', message_html);
-			// Attaches a click event listener to the latest rendered message bubble
-			var existing_messages = document.querySelectorAll(".certainly-message");
-			existing_messages[existing_messages.length-1].addEventListener("click", function() {
+		var message_html = `<li class="certainly-message">
+				<div class="certainly-bubble" title="Chatbot wrote: ${messages[i]}">${messages[i]}</div>
+			</li>`;
+		document.querySelector("#certainly-popups").insertAdjacentHTML('beforeend', message_html);
+		// Attaches a click event listener to the latest rendered message bubble
+		var existing_messages = document.querySelectorAll(".certainly-message");
+		existing_messages.forEach(function(message){
+			setTimeout(function() {
+				message.style.transform = "scale(1)";
+				message.addEventListener("click", function() {
 					certainly.destroyPopups(certainly.open())
-				}); 
-			
-		}, i * 1550);
-		
+				});
+				document.querySelector("#certainly-popups-close").style.display = "block";
+			}, i*1100)
+		});
+
+		// Listener for when the Certainly Widget is opened
+		certainly.onWidgetOpen = function(){
+			certainly.destroyPopups();
+		}	
 	}
 }
 
@@ -100,8 +100,22 @@ certainly.destroyPopups = function(callback){
 }
 
 // Checks if popups are configured for this webpage & device type & locale
-certainly.checkPopups = function(){
+certainly.checkPopups = function(callback){
 	if (CERTAINLY_POPUPS && CERTAINLY_POPUPS.length > 0){
+
+		// Checks if any popup rules share the same id. It is forbidden
+		var valueArr = CERTAINLY_POPUPS.map(function(item){ return item.id });
+		var duplicateExists = valueArr.some(function(item, idx){ 
+				return valueArr.indexOf(item) != idx 
+		});
+		if (duplicateExists){
+			certainly.trace("Found popup rules with the same id property. Please ensure each popup rule has a unique value as an id")
+			if(callback){
+				callback();
+			}
+			return;
+		}
+
 		popups = CERTAINLY_POPUPS.filter( popup => popup.condition);
 		// Checks if a popup is setup for both the current page and the current device
 		if (popups.length != 0){
@@ -136,11 +150,17 @@ certainly.checkPopups = function(){
 		}
 
 		popup = popups[0];
-		if(popup && popup.messages && popup.messages.length > 0) {
+		if (popup && popup.messages && popup.messages.length > 0) {
 			popup.messages.forEach(variation => {
-				if(variation.language == CURRENT_LANGUAGE){
+				if (variation.language == certainly_config.cvars.language || !certainly_config.cvars.language || certainly_config.cvars.language == ""){
 					certainly.initPopups(variation.texts, popup.trigger, popup.delay)
 					localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(1));
+					// Passes the active popup as a cvar to the bot, so it can be used in the conversation logic
+					certainly_config.cvars.current_popup = popup.id;
+					// If the starting module is overridden in the popup setings, applies the change
+					if (popup.start_from_module && popup.start_from_module != ""){
+						certainly_config.ref = popup.start_from_module;
+					}
 				}
 				else {
 					certainly.trace("Language variation unavailable for this popup")
@@ -152,4 +172,20 @@ certainly.checkPopups = function(){
 	else {
 		certainly.trace("No popups found in the configuration object certainly_config")
 	}
+
+	if(callback){
+		callback();
+	}
 }
+
+// Inits the Certainly Widget and passes the necessary callback functions
+
+certainly.checkPopups(
+	initCertainlyWidget(
+		certainly_config,
+		function(){
+			certainly.minimize();
+		}
+	)
+);
+

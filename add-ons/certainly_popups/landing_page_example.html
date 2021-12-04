@@ -1,21 +1,23 @@
 <head>
-	<script src="https://app.certainly.io/sdk/webchat.js"></script>
-	<link rel="stylesheet" href="/certainly-popups/certainly-popups.css">
-
 </head>
 <iframe src="https://www.tigerofsweden.com/dk/" title="Tiger of Sweden" style="width:100vw;height:100vh;" frameBorder="0">
 </iframe>
 
+<script src="https://app.certainly.io/sdk/webchat.js"></script>
+<link rel="stylesheet" href="/certainly-popups/certainly-popups.css">
+
 <script>
 certainly_config = 
 	{
-		id: "47d61385-6328-449b-9452-40b17c1c7fd2",
+		id: "f5ab1403-3b14-4b80-9267-11c96f90cfac",
 		webchatKey: "certainly",
 		mode: "clear_past_conversations",
 		debuggerMode: 1,
-		debug: true
+		debug: true,
+		cvars: {
+			language: "en" // Can be passed dynamically by the site. This language will be used by the popups
+		}
 	}
-
 </script>
 
 <script src="/certainly-popups/certainly-popups-config.js"></script>
