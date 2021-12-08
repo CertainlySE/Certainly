@@ -1,18 +1,16 @@
 const CURRENT_URL = window.location.href;
 const CURRENT_DEVICE_TYPE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile": "desktop";
-let popups;
-
+let certainly_popups;
 
 
 // Debug utility function
 certainly.trace = function (message){
-	if(certainly_config.debug){
+	if(certainly_config.debuggerMode && certainly_config.debuggerMode == '1'){
 		console.trace(message+"\n")
-
 	}
 }
 
-// Method that mazimized the Certainly Widget
+// Method that mazimizes the Certainly Widget
 certainly.open = function(callback){
 	certainly.widgetStatus(
 		{
@@ -22,26 +20,79 @@ certainly.open = function(callback){
 	)
 }
 
-// Method that set minimizes Certainly Widget
-certainly.minimize = function(){
+// Method that  minimizes the Certainly Widget
+certainly.minimize = function(callback){
 	certainly.widgetStatus(
 		{
 			action: "close",
 			webchatKey: certainly_config.webchatKey
-		}
+		},
+		()=> {if(callback){callback();}}
 	)
 }
 
-                                   
 
 // Method that inits popups
-certainly.initPopups = function(messages, trigger = "page_load", delay = 1000){
-	delay = delay < 1000 ? 1000 : delay;
-	if (trigger == "page_load"){
-		setTimeout(() => {certainly.renderPopups(messages)}, delay);
+certainly.initPopups = function(popup){
+	popup.trigger = popup.trigger ? popup.trigger : "page_load";
+	popup.delay = popup.delay < 1000 ? 1000 : popup.delay;
+	popup.repeat_after = popup.repeat_after ? popup.repeat_after : 0;
+	var messages = popup.messages.find( message => ( message.language == 			certainly_config.language ||
+	!	certainly_config.language ||
+	certainly_config.language == ""));
+
+	if (messages.length == 0){
+		certainly.trace("No message texts variations available for the current language")
+		return;
 	}
-	else {
-		setTimeout(() => {certainly.renderPopups(messages)}, delay);
+	
+	if (popup.trigger == "page_load"){ // Immediately renders the popups
+		localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(1));
+		// Passes the active popup as a cvar to the bot, so it can be used in the conversation logic
+		certainly_config.cvars.current_popup = popup.id;
+		// If the starting module is overridden in the popup setings, applies the change
+		if (popup.start_from_module && popup.start_from_module != ""){
+			certainly_config.ref = popup.start_from_module;
+		}
+		last_shown_popup = JSON.parse(window.localStorage.getItem(`certainly_popup_${popup.id}`));
+
+		if(last_shown_popup){
+			if(last_shown_popup && parseInt(last_shown_popup) < popup.repeat_after ){
+				certainly.trace("A popup was found but not shown due to the repeat_after setting");
+			}
+			else {
+				setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);
+			}
+			localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
+				(parseInt(last_shown_popup) + 1)
+			));
+		}
+		else {
+			setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay)
+		}
+	}
+	else if (popup.trigger == "chat_minimized"){ // Attaches an event listner for when the Certainly Widget is minimized
+		certainly.trace("This popup will be rendered when Certainly is minimized")
+		var certainly_popups_on_chat_minimized = 0;
+		certainly.onWidgetOpen = function(){ // Wraps the onClose method, so that the first time the bot is minimized programmatically, the popup on minimize is not shown
+			certainly.onWidgetClose = function(){ // Renders the popup on Widget close
+				if (certainly_popups_on_chat_minimized == 0 ||
+					popup.repeat_after == 0){
+					setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);
+								
+				}
+				certainly_popups_on_chat_minimized = certainly_popups_on_chat_minimized + 1;
+
+				// Resets the shown counter
+				if(certainly_popups_on_chat_minimized == repeat_after){ 
+					certainly_popups_on_chat_minimized = 0;
+				}
+								
+			}
+		}		
+	}
+	else { // If the trigger is not recognized, immediately renders the popup
+		setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);
 	}
 }
 
@@ -62,7 +113,7 @@ certainly.renderPopups = function(messages){
 			certainly.destroyPopups()
 		}); 
 	}
-	certainly.trace("Rendering popups");
+	certainly.trace("Rendering popups", messages);
 	for (let i = 0; i < messages.length; i++) {
 		var message_html = `<li class="certainly-message">
 				<div class="certainly-bubble" title="Chatbot wrote: ${messages[i]}">${messages[i]}</div>
@@ -116,56 +167,23 @@ certainly.checkPopups = function(callback){
 			return;
 		}
 
-		popups = CERTAINLY_POPUPS.filter( popup => popup.condition);
+		certainly_popups = CERTAINLY_POPUPS.filter( popup => ( popup.condition && 
+			popup[CURRENT_DEVICE_TYPE]));
 		// Checks if a popup is setup for both the current page and the current device
-		if (popups.length != 0){
-			certainly.trace("Popup available for this webpage")
-			popups = popups.filter( popup => popup[CURRENT_DEVICE_TYPE]);
-			
-			if (popups.length == 0){
-				certainly.trace("Popup not available for this device")
-			}
-		}
-		// Checks if the popup should be shown, according to the repeat_after property
-		if (popups.length > 0){
-			var popup = popups[0];
-			last_shown_popup = JSON.parse(window.localStorage.getItem(`certainly_popup_${popup.id}`));
-			if(last_shown_popup){
-				if(last_shown_popup && parseInt(last_shown_popup) < popup.repeat_after ){
-					certainly.trace("A popup was found but not shown due to the repeat_after setting");
-					console.log("up", last_shown_popup)
-					console.log((parseInt(last_shown_popup) + 1))
-					localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
-						(parseInt(last_shown_popup) + 1)
-					));
-					// Empties the list of popups that are valid for this webpage & device, because the only valid popup was recently shown
-					popups = []
-				}
-			}
-		}
 
-		if (popups.length == 0){
-			certainly.trace("No popups to show");
-			return;
-		}
-
-		popup = popups[0];
-		if (popup && popup.messages && popup.messages.length > 0) {
+		certainly_popups.forEach(function(popup){
+			if (popup && popup.messages && popup.messages.length > 0) {
+				certainly.initPopups(popup)
+			}
 			popup.messages.forEach(variation => {
-				if (variation.language == certainly_config.cvars.language || !certainly_config.cvars.language || certainly_config.cvars.language == ""){
-					certainly.initPopups(variation.texts, popup.trigger, popup.delay)
-					localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(1));
-					// Passes the active popup as a cvar to the bot, so it can be used in the conversation logic
-					certainly_config.cvars.current_popup = popup.id;
-					// If the starting module is overridden in the popup setings, applies the change
-					if (popup.start_from_module && popup.start_from_module != ""){
-						certainly_config.ref = popup.start_from_module;
+				if (variation.language == certainly_config.cvars.language || !certainly_config.cvars.language || certainly_config.cvars.language == ""){						
+					
 					}
-				}
-				else {
-					certainly.trace("Language variation unavailable for this popup")
-				}
 			});
+		});
+					
+		if (certainly_popups.length == 0){
+			certainly.trace("No popups to show");
 		}
 	}
 
@@ -179,13 +197,14 @@ certainly.checkPopups = function(callback){
 }
 
 // Inits the Certainly Widget and passes the necessary callback functions
-
 certainly.checkPopups(
-	initCertainlyWidget(
-		certainly_config,
-		function(){
-			certainly.minimize();
-		}
-	)
+	function(){
+		initCertainlyWidget(
+			certainly_config,
+			function(){
+				certainly.minimize();
+			}
+		)
+	}
 );
 

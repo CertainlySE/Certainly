@@ -1,8 +1,7 @@
-const CURRENT_LANGUAGE = "en";
 const CERTAINLY_POPUPS =  [
   {
     id: "default", // String, unique name of the popup
-    trigger: "page_load", // String or function. If string, accepted values are: "page_load", "inactivity". If function, it must return a boolean value: true or false
+    trigger: "page_load", // String or function. If string, accepted values are: "page_load", "inactivity", "chat_minimized". If function, it must return a boolean value: true or false
     condition: true, // Boolean or function. If function, it must return a boolean value: true or false.
     delay: 1000, // Time in ms after which the first popup text is rendered
     repeat_after: 0, // Number of times after which this popup will show up again
@@ -17,6 +16,6 @@ const CERTAINLY_POPUPS =  [
           ]
       }
     ],
-    start_from_module: "", // Optional, overrides the default chat start module ID 
+    start_from_module: "", // Optional, overrides the defau,lt chat start module ID 
   }
 ]
