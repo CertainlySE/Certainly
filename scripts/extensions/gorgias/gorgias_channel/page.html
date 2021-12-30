@@ -1,0 +1,42 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<iframe src="https://certainly.io/customer-service" style="width:100%;height:100%;" frameBorder="0"></iframe>
+		
+		<script src="https://app.certainly.io/sdk/webchat.js"></script>
+<!--<script src="src/gorgias.js"></script>-->
+
+		<!--Gorgias Chat Widget Start-->
+		<script id="gorgias-chat-widget-install-v2" src="https://config.gorgias.chat/gorgias-chat-bundle-loader.js?applicationId=8611"></script>
+		<!--Gorgias Chat Widget End-->
+
+		<script>
+		var CERTAINLY_GORGIAS = {
+			start_chat: "615435",
+			agent_reply: "615437",
+			visitor_reply: "615436"
+		}
+		</script>
+
+
+		<!--Certainly Widget Start-->
+		<script>
+		initCertainlyWidget({
+			id: "d56d3bcd-8d79-4311-a808-cc0ecc8dcf1a",
+			mode: "clear_conversation_history",
+			right: 500,
+			cvars: {
+				visitorName: "John",
+				visitorEmail: "jd@email.com"
+			}
+		});
+		</script>
+		<!--Certainly Widget End-->
+
+		<!--Gorgias extension for Certainly-->
+		<script src="src/certainly_gorgias.js"></script>
+		<!--Gorgias extension for Certainly End-->
+
+	</body>
+</html>

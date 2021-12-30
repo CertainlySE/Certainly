@@ -1,7 +1,7 @@
 const CURRENT_URL = window.location.href;
 const CURRENT_DEVICE_TYPE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile": "desktop";
 let certainly_popups;
-
+var time;
 
 // Debug utility function
 certainly.trace = function (message){
@@ -32,6 +32,8 @@ certainly.minimize = function(callback){
 }
 
 
+
+
 // Method that inits popups
 certainly.initPopups = function(popup){
 	popup.trigger = popup.trigger ? popup.trigger : "page_load";
@@ -47,28 +49,41 @@ certainly.initPopups = function(popup){
 	}
 	
 	if (popup.trigger == "page_load"){ // Immediately renders the popups
-		localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(1));
 		// Passes the active popup as a cvar to the bot, so it can be used in the conversation logic
 		certainly_config.cvars.current_popup = popup.id;
 		// If the starting module is overridden in the popup setings, applies the change
 		if (popup.start_from_module && popup.start_from_module != ""){
 			certainly_config.ref = popup.start_from_module;
 		}
-		last_shown_popup = JSON.parse(window.localStorage.getItem(`certainly_popup_${popup.id}`));
-
+		last_shown_popup = parseInt(JSON.parse(window.localStorage.getItem(`certainly_popup_${popup.id}`)));
+		if(!last_shown_popup){
+			last_shown_popup = 0;
+		}
 		if(last_shown_popup){
-			if(last_shown_popup && parseInt(last_shown_popup) < popup.repeat_after ){
-				certainly.trace("A popup was found but not shown due to the repeat_after setting");
-			}
-			else {
+			if (last_shown_popup > popup.repeat_after || popup.repeat_after == 0){
+				localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
+					(1)
+				));
 				setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);
 			}
-			localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
-				(parseInt(last_shown_popup) + 1)
-			));
+			else if( last_shown_popup <= popup.repeat_after ){
+				certainly.trace("A popup was found but not shown due to the repeat_after setting");
+				localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
+					(last_shown_popup + 1)
+				));
+			}
+			else {
+				localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
+					(last_shown_popup + 1)
+				));
+			}
+			
 		}
 		else {
-			setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay)
+			setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);
+			localStorage.setItem(`certainly_popup_${popup.id}`, JSON.stringify(
+				(1)
+			));
 		}
 	}
 	else if (popup.trigger == "chat_minimized"){ // Attaches an event listner for when the Certainly Widget is minimized
@@ -90,6 +105,9 @@ certainly.initPopups = function(popup){
 								
 			}
 		}		
+	}
+	else if (popup.trigger == "inactivity"){
+
 	}
 	else { // If the trigger is not recognized, immediately renders the popup
 		setTimeout(() => {certainly.renderPopups(messages.texts)}, popup.delay);

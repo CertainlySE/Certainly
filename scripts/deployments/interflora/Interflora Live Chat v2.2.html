@@ -1,0 +1,108 @@
+<script>
+var certainlySettings = {
+	id: "93f46257-5efa-45e0-92b1-937a9ec2eebd",
+	dixaWidgetId: "07a1f494-99d3-4bff-8a9b-63734f48e605",
+	dixaEmailIntegrationId: "interflora-test-kundeservice@email.dixa.io", 
+	buttonLogoOpen: "https://ucarecdn.com/e84b5ed8-2791-4b56-b5cf-aadcf2b0204a/IF_Chatbot_Icon_Default.svg",
+	buttonLogoClose: "https://ucarecdn.com/b84ae349-99cf-4393-a424-7ea0ca8d77d6/IF_Chatbot_Icon_Active.svg",
+	buttonWidth: 210,
+	buttonHeight: 41,
+	right: 0,
+	bottom: 0,
+	waitingForAgent: "626450",
+	modules: {
+		agentJoined: "626445",
+		agentLeft: "626447",
+		agentMessage: "626446", 
+		visitorMessage: "626449", // Messages received at this module will be sent to Dixa
+		conversationEnded: "626448",
+	}
+};
+</script>
+
+<script>
+var script = document.createElement("script");
+script.type = "text/javascript", script.addEventListener("load", function(e) {
+        initCertainlyDixaChat()
+    }), script.src = "https://app.certainly.io/sdk/webchat.js", document.getElementsByTagName("head")[0].appendChild(script),
+    function(e, t, a, i, n, s, o, r) {
+        e[n] = e[n] || function() {
+            (e[n].q = e[n].q || []).push(arguments), e[n].handler && e[n].handler(arguments)
+        }, e[n].l = 1 * new Date, e[n].wid = certainlySettings.dixaWidgetId, o = t.createElement("script"), r = t.getElementsByTagName("script")[0], o.async = 1, o.setAttribute("charset", "utf-8"), o.src = "https://widget.dixa.io/assets/scripts/javascript/loader.js", r.parentNode.insertBefore(o, r)
+    }(window, document, 0, 0, "_dixa"), certainlySettings.webchatKey = "certainly-dixa", certainlySettings.cvars = {
+        dixaWidgetId: certainlySettings.dixaWidgetId,
+        dixaEmailIntegrationId: certainlySettings.dixaEmailIntegrationId
+    }, certainlySettings.metapayload = {
+        visitorName: "",
+        visitorEmail: "",
+        userId: ""
+    };
+var styleString = "#dixa-iframe-wrapper {\n\tdisplay: none!important;\n\t}";
+var style = document.createElement("style");
+var dixaHasConversation;
+
+function initCertainlyDixaChat() {
+    initCertainlyWidget(certainlySettings, function() {
+        certainly.toDixa = function(e) {
+            console.log("Triggering handover. Payload: ", e), certainlySettings.metapayload.visitorName = e.visitorName, certainlySettings.metapayload.visitorEmail = e.visitorEmail, certainlySettings.metapayload.userId = e.userId, certainlySettings.metapayload.transcript = e.chatHistory, window._dixa("api.setView", "conversation"), window._dixa("api.setUser", certainlySettings.metapayload.visitorName, certainlySettings.metapayload.visitorEmail), window._dixa("api.setMessage", "New visitor from Certainly"), setTimeout(function() {
+                window._dixa("api.setMessage", e.chatHistory)
+            }, 750)
+        }, certainly.getCertainlyTransfer({
+            actionName: certainlySettings.waitingForAgent,
+            webchatKey: certainlySettings.webchatKey,
+            callback: function(e){ certainly.toDixa(e.cvars)}
+        }), certainly.getCertainlyTransfer({
+            actionName: certainlySettings.modules.visitorMessage,
+            webchatKey: certainlySettings.webchatKey,
+            callback: function(e) {
+                console.log("Sending visitor message to Dixa", e), null != e.cvars.visitor_message && _dixa("api.setMessage", e.cvars.visitor_message)
+            }
+        })
+    })
+}
+style.textContent = styleString, document.head.append(style), JSON.parse(localStorage.getItem("dixa-widget")) && (dixaHasConversation = JSON.parse(localStorage.getItem("dixa-widget")).conversation).currentConversation && !dixaHasConversation.currentConversation.is_closed && (console.log("Resuming conversation on Dixa"), certainlySettings.ref = certainlySettings.modules.agentMessage, certainlySettings.cvars.agent_message = "", certainlySettings.metapayload.userId = JSON.parse(localStorage.getItem("dixa-widget")).user.currentUser.id), _dixa("api.subscribe", "onConversationStarted", function() {}), _dixa("api.subscribe", "onMessageAdded", function(e) {
+    if (console.log("Message added: ", e), e.author.id != certainlySettings.metapayload.userId && "dixa-bot" != e.author.name) {
+        console.log("Sending human agent message to Certainly");
+        var t = 125 * e.message.text.length;
+        certainly.sendMessage({
+            sender: "bot",
+            message: {
+                type: "wait",
+                wait: t
+            },
+            webchatKey: certainlySettings.webchatKey
+        }, function() {
+            console.log("callback")
+        }), setTimeout(function() {
+            console.log("Posting message to Certainly"), certainly.goTo({
+                module: certainlySettings.modules.agentMessage,
+                webchatKey: certainlySettings.webchatKey,
+                cvars: {
+                    agent_message: e.message.text
+                }
+            })
+        }, t)
+    }
+}), _dixa("api.subscribe", "onAgentAssigned", function(e) {
+    console.log("Agent joined: ", e), certainly.goTo({
+        module: certainlySettings.modules.agentJoined,
+        webchatKey: certainlySettings.webchatKey,
+        cvars: {
+            agentName: e.agent.name
+        }
+    })
+}), _dixa("api.subscribe", "onAgentUnassigned", function(e) {
+    console.log("Agent left: ", e), certainly.goTo({
+        module: certainlySettings.modules.agentLeft,
+        webchatKey: certainlySettings.webchatKey,
+        cvars: {
+            agentName: e.agent.name
+        }
+    })
+}), _dixa("api.subscribe", "onConversationEnded", function() {
+    console.log("Conversation ended"), certainly.goTo({
+        module: certainlySettings.modules.conversationEnded,
+        webchatKey: certainlySettings.webchatKey
+    })
+});
+</script>

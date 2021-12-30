@@ -1,0 +1,38 @@
+<html>
+   <head>
+      <!-- Google Analytics Script tag -->
+      <script>
+         (function (i, s, o, g, r, a, m) {
+         	i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+         		(i[r].q = i[r].q || []).push(arguments)
+         	}, i[r].l = 1 * new Date(); a = s.createElement(o),
+         		m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+         })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+         
+         // The first tracker will be used by the Certainly extension
+         ga('create', 'UA-85619831-3', 'auto');
+      </script>
+
+      <!-- End of Google Analytics Script tag -->
+   </head>
+   <body>
+      <iframe src="https://certainly.io/customer-service" style="width:100%;height:100%;" frameBorder="0"></iframe>
+      
+			<!--Certainly Widget Start-->
+      <script src="https://app.certainly.io/sdk/webchat.js"></script>
+      <script>
+         initCertainlyWidget({
+         	id: "93c195ef-d163-4511-8494-9834408e0e0f",
+         	mode: "clear_past_conversations",
+         	cvars: {
+         		// You can pass metadata here
+         	},
+         });
+      </script>
+      <!--Certainly Widget End-->
+
+      <!--Google Analytics event sender script for Certainly-->
+      <script src="src/ga.js"></script>
+      <!--Google Analytics event sender script for Certainly End-->
+   </body>
+</html>
