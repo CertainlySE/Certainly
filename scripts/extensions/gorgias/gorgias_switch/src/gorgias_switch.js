@@ -1,17 +1,17 @@
 // Hides the Gorgias Widget
 document.head.insertAdjacentHTML("beforeend", `<style id="custom-gorgias-style">#gorgias-chat-container{ display:none;}</style>`)
 
-var 
 function showGorgiasChat() {
     // Overrides the default Gorgias Widget styling and shows it
     document.querySelector("#chat-window").contentDocument.body.insertAdjacentHTML("beforeend", `
  <style id="custom-gorgias-style">
-   .widget-md {
+   .widget-md, .widget-lg {
      width:400px;
      height:600px;
      top:0;
      right:0;
      left:unset;
+     border-radius: 10px!important;
    }
    .widget-xs {
        border-radius: 10px!important;

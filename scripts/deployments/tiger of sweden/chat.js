@@ -1,4 +1,3 @@
-<script>
 var certainlyChat = function() {
     var url = new URL(window.location.href);
     if (url.searchParams.get('disableBot')) {
@@ -644,7 +643,6 @@ var certainlyChat = function() {
             document.getElementsByTagName('head')[0].appendChild(customStyle);*/
 
             // Keeps track of how many pages have been browsed and tiggers the bot on the third one
-            // Resets the count after 19 visits
             var previousSessions = JSON.parse(window.localStorage.getItem("certainlySessions"));
             if (previousSessions == null){
                 previousSessions = 0;
@@ -661,9 +659,9 @@ var certainlyChat = function() {
                 window.location.pathname.length > 5 
                 ) 
                 ||
-                previousSessions == 3 // After three browsed pages, the bot opens itself
-                ||
-                previousSessions == 24 // 21 clicks after the widget last opened itself automatically
+                previousSessions == 3
+				||
+				previousSessions == 24
                 ) {
                 certainly.widgetStatus({
                     action: "open", // Required
@@ -682,4 +680,3 @@ var certainlyChat = function() {
 }
 
 certainlyChat();
-</script>

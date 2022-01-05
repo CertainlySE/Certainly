@@ -1,21 +1,26 @@
-const CURRENT_URL = window.location.href;
-const CURRENT_DEVICE_TYPE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile": "desktop";
-let certainly_popups;
-var time;
+(function() {
+var certainly_popups = {  // Global variables used later on
+	to_render: "",
+	time: "",
+	current_url: window.location.href,
+	current_device_type: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile": "desktop"
+}
 
 // Debug utility function
 certainly.trace = function (message){
-	if(certainly_config.debuggerMode && certainly_config.debuggerMode == '1'){
-		console.trace(message+"\n")
+	if (typeof certainly_settings !== "undefined" ){
+		if(certainly_settings.debuggerMode && certainly_settings.debuggerMode == '1'){
+			console.trace(message+"\n")
+		}
 	}
 }
 
-// Method that mazimizes the Certainly Widget
+// Method that maximizes the Certainly Widget
 certainly.open = function(callback){
 	certainly.widgetStatus(
 		{
 			action: "open",
-			webchatKey: certainly_config.webchatKey
+			webchatKey: certainly_settings.webchatKey
 		}, callback
 	)
 }
@@ -25,13 +30,11 @@ certainly.minimize = function(callback){
 	certainly.widgetStatus(
 		{
 			action: "close",
-			webchatKey: certainly_config.webchatKey
+			webchatKey: certainly_settings.webchatKey
 		},
 		()=> {if(callback){callback();}}
 	)
 }
-
-
 
 
 // Method that inits popups
@@ -39,9 +42,9 @@ certainly.initPopups = function(popup){
 	popup.trigger = popup.trigger ? popup.trigger : "page_load";
 	popup.delay = popup.delay < 1000 ? 1000 : popup.delay;
 	popup.repeat_after = popup.repeat_after ? popup.repeat_after : 0;
-	var messages = popup.messages.find( message => ( message.language == 			certainly_config.language ||
-	!	certainly_config.language ||
-	certainly_config.language == ""));
+	var messages = popup.messages.find( message => ( message.language == 			certainly_settings.language ||
+	!	certainly_settings.language ||
+	certainly_settings.language == ""));
 
 	if (messages.length == 0){
 		certainly.trace("No message texts variations available for the current language")
@@ -50,10 +53,10 @@ certainly.initPopups = function(popup){
 	
 	if (popup.trigger == "page_load"){ // Immediately renders the popups
 		// Passes the active popup as a cvar to the bot, so it can be used in the conversation logic
-		certainly_config.cvars.current_popup = popup.id;
+		certainly_settings.cvars.current_popup = popup.id;
 		// If the starting module is overridden in the popup setings, applies the change
 		if (popup.start_from_module && popup.start_from_module != ""){
-			certainly_config.ref = popup.start_from_module;
+			certainly_settings.ref = popup.start_from_module;
 		}
 		last_shown_popup = parseInt(JSON.parse(window.localStorage.getItem(`certainly_popup_${popup.id}`)));
 		if(!last_shown_popup){
@@ -116,12 +119,12 @@ certainly.initPopups = function(popup){
 
 // Method that renders popup texts, after the popups have been initialized
 certainly.renderPopups = function(messages){
-	if (!document.querySelector(`#botxo-chat-${certainly_config.webchatKey}`)){
+	if (!document.querySelector(`#botxo-chat-${certainly_settings.webchatKey}`)){
 		certainly.trace("Certainly Widget not found. Cannot render popups")
 		return;
 	}
 	if (!document.querySelector("#certainly-popups")){
-		document.querySelector(`#botxo-chat-${certainly_config.webchatKey}`).
+		document.querySelector(`#botxo-chat-${certainly_settings.webchatKey}`).
 		insertAdjacentHTML('afterbegin', `<div id="certainly-popups-container">
 				<ul id="certainly-popups">
 					<div id="certainly-popups-close" style="display:none;">X</div>
@@ -156,7 +159,7 @@ certainly.renderPopups = function(messages){
 	}
 }
 
-// Method that destroys the redenred popups
+// Method that destroys the rendered popups
 certainly.destroyPopups = function(callback){
 	if (!document.querySelector("#certainly-popups-container")){
 		certainly.trace("Certainly Popup container not found")
@@ -170,6 +173,10 @@ certainly.destroyPopups = function(callback){
 
 // Checks if popups are configured for this webpage & device type & locale
 certainly.checkPopups = function(callback){
+	if (typeof CERTAINLY_POPUPS === 'undefined'){
+		certainly.trace("No popup configuration found. Please define your popup rules via the CERTAINLY_POPUPS const");
+		return;
+	}
 	if (CERTAINLY_POPUPS && CERTAINLY_POPUPS.length > 0){
 
 		// Checks if any popup rules share the same id. It is forbidden
@@ -185,28 +192,28 @@ certainly.checkPopups = function(callback){
 			return;
 		}
 
-		certainly_popups = CERTAINLY_POPUPS.filter( popup => ( popup.condition && 
-			popup[CURRENT_DEVICE_TYPE]));
+		certainly_popups.to_render = CERTAINLY_POPUPS.filter( popup => ( popup.condition && 
+			popup[certainly_popups.current_device_type]));
 		// Checks if a popup is setup for both the current page and the current device
 
-		certainly_popups.forEach(function(popup){
+		certainly_popups.to_render.forEach(function(popup){
 			if (popup && popup.messages && popup.messages.length > 0) {
 				certainly.initPopups(popup)
 			}
 			popup.messages.forEach(variation => {
-				if (variation.language == certainly_config.cvars.language || !certainly_config.cvars.language || certainly_config.cvars.language == ""){						
+				if (variation.language == certainly_settings.cvars.language || !certainly_settings.cvars.language || certainly_settings.cvars.language == ""){						
 					
 					}
 			});
 		});
 					
-		if (certainly_popups.length == 0){
+		if (certainly_popups.to_render.length == 0){
 			certainly.trace("No popups to show");
 		}
 	}
 
 	else {
-		certainly.trace("No popups found in the configuration object certainly_config")
+		certainly.trace("No popups found in the configuration object certainly_settings")
 	}
 
 	if(callback){
@@ -217,12 +224,16 @@ certainly.checkPopups = function(callback){
 // Inits the Certainly Widget and passes the necessary callback functions
 certainly.checkPopups(
 	function(){
+		if (typeof certainly_settings === "undefined" ){
+			certainly.trace(`Certainly could not be launched.\nYou need to define your web widget settings under variable "certainly_settings"`)
+			return;
+		}
 		initCertainlyWidget(
-			certainly_config,
+			certainly_settings,
 			function(){
 				certainly.minimize();
 			}
 		)
 	}
 );
-
+})();

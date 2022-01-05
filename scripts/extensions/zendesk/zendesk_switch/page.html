@@ -1,0 +1,33 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<iframe src="https://certainly.io/customer-service" style="width:100%;height:100%;" frameBorder="0"></iframe>
+		
+		<!--Zendesk Chat Widget Start-->
+		<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=66dca387-9072-4c5a-8eab-8b8508fcd9a3"></script>
+		<!--Zendesk Chat Widget End-->
+
+
+		<!--Certainly Widget Start-->
+		<script src="https://app.certainly.io/sdk/webchat.js"></script>
+		<script>
+		initCertainlyWidget({
+			id: "4807d5c6-7fef-4ad5-8929-9b0d5c99a6b4",
+			mode: "clear_past_conversations",
+			ref: "678549",
+			cvars: {
+				// You can pass metadata to Certainly
+			},
+			inputType: "bottom"
+		});
+		</script>
+		<!--Certainly Widget End-->
+
+
+		<!--Zendesk extension for Certainly Start-->
+		<script src="src/zendesk_switch.js"></script>
+		<!--Zendesk extension for Certainly End-->
+
+	</body>
+</html>
