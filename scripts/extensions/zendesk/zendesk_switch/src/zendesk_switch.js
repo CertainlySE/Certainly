@@ -1,11 +1,11 @@
 (function(){
     document.head.insertAdjacentHTML("beforeend", `<style id="custom-zendesk-style">
     #webWidget {
-        width: 400px!important;
+        width: calc(400px + 2 * 1rem)!important;
         max-height: calc(100vh - 32px);
-        height: 600px!important;
+        height: calc(600px + 2 * 1rem)!important;
         right: 25px!important;
-        bottom: 140px!important;
+        bottom: 129px!important;
     }
 </style>`);
 
@@ -27,6 +27,12 @@
                     zE('webWidget', 'hide');
                     localStorage.removeItem("ZD-store");
                     
+                    certainly.resetChat(
+                        {
+                          webchatKey: "",
+                        }
+                      )
+
                     certainly.widgetStatus({
                         action: "show"
                     })
@@ -61,6 +67,18 @@
                         name: data.cvars.visitor_name ? data.cvars.visitor_name : 'Anonymous Visitor',
                         email: data.cvars.visitor_email ? data.cvars.visitor_email :'visitor@email.com'
                     });
+
+                    if (data.cvars.zendesk_department){
+                        zE('webWidget', 'updateSettings', {
+                            webWidget: {
+                              chat: {
+                                departments: {
+                                  select: data.cvars.zendesk_department
+                                }
+                              }
+                            }
+                          });
+                    }
                     var opening_message = data.cvars.chatHistory ? data.cvars.chatHistory : "The transcript between Certainly and this visitor is not available";
                     zE('webWidget', 'show');
                     zE('webWidget', 'open');

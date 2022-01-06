@@ -196,16 +196,21 @@ certainly.checkPopups = function(callback){
 			popup[certainly_popups.current_device_type]));
 		// Checks if a popup is setup for both the current page and the current device
 
-		certainly_popups.to_render.forEach(function(popup){
+
+		/*certainly_popups.to_render.forEach(function(popup){
 			if (popup && popup.messages && popup.messages.length > 0) {
-				certainly.initPopups(popup)
+				certainly.initPopups(certainly_popups.to_render[0])
 			}
 			popup.messages.forEach(variation => {
 				if (variation.language == certainly_settings.cvars.language || !certainly_settings.cvars.language || certainly_settings.cvars.language == ""){						
-					
 					}
 			});
-		});
+		});*/
+		//
+		if (certainly_popups.to_render.length > 0) {
+			console.log("Rendering popups", certainly_popups.to_render)
+			certainly.initPopups(certainly_popups.to_render[0])
+		}
 					
 		if (certainly_popups.to_render.length == 0){
 			certainly.trace("No popups to show");
