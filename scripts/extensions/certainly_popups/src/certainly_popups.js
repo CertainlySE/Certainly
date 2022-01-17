@@ -119,12 +119,12 @@ certainly.initPopups = function(popup){
 
 // Method that renders popup texts, after the popups have been initialized
 certainly.renderPopups = function(messages){
-	if (!document.querySelector(`#botxo-chat-${certainly_settings.webchatKey}`)){
+	if (!document.querySelector(`div[id^='botxo-chat-']`)){
 		certainly.trace("Certainly Widget not found. Cannot render popups")
 		return;
 	}
 	if (!document.querySelector("#certainly-popups")){
-		document.querySelector(`#botxo-chat-${certainly_settings.webchatKey}`).
+		document.querySelector(`div[id^='botxo-chat-']`).
 		insertAdjacentHTML('afterbegin', `<div id="certainly-popups-container">
 				<ul id="certainly-popups">
 					<div id="certainly-popups-close" style="display:none;">X</div>
