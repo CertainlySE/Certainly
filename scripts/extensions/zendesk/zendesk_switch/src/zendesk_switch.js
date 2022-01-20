@@ -1,4 +1,9 @@
-(function(){
+//Small utility function to listen for when an object is defined
+(function(){window.whenDefined=function(a,b,c){a[b]?c():Object.defineProperty(a,b,{configurable:!0,enumerable:!0,writeable:!0,get:function(){return this["_"+b]},set:function(a){this["_"+b]=a,c()}})}}).call(this);
+
+
+whenDefined(window, 'certainly',
+function(){
     document.head.insertAdjacentHTML("beforeend", `<style id="custom-zendesk-style">
     #webWidget {
         width: calc(400px + 2 * 1rem)!important;
@@ -101,5 +106,5 @@
             }
         }
     });
-})();
+});
 
