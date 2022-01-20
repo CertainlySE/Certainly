@@ -59,6 +59,7 @@ function(){
 
     }, 200);
 
+ var handover_triggered = false;
 
     certainly.getCertainlyTransfer({
         actionName: "*",
@@ -66,7 +67,8 @@ function(){
             if (data.cvars == "") {
                 console.log("You need to enable your Certainly bot to expose custom variables")
             }
-            if (data.cvars.zendesk && data.cvars.zendesk == "start_chat") {
+            if (data.cvars.zendesk && data.cvars.zendesk == "start_chat" && !handover_triggered) {
+                handover_triggered == true;
                 console.log("Starting a chat on Zendesk")
                 if (window.zE) {
                     zE('webWidget', 'identify', {
