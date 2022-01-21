@@ -199,8 +199,8 @@ var previous_data = "";
             previous_web_action = data.cvars.web_action;
         }
         else if (data.cvars.web_action == "open_url" && previous_web_action != "open_url" && typeof(data.cvars.url) != null){
-            var destination_url = data.cvars.web_action;
-            if (destination_url.includes("tigerofsweden.com")) {
+            var destination_url = data.cvars.url;
+            if (destination_url.includes(window.location.host)) {
                 window.location.href = destination_url;
             }
             else { //URL path is relative
