@@ -3,7 +3,6 @@
 
 var checkExist = setInterval(function() {
 	if (certainly && certainly_settings && certainly_settings.cvars) {
-		 console.log("Success");
 		 clearInterval(checkExist);
 
 	var certainly_popups = {  // Global variables used later on
@@ -203,7 +202,7 @@ var checkExist = setInterval(function() {
 					actionName: "*",
 					webchatKey: "1",
 					callback: (data) => {
-						console.log("Conversation updated")
+						//console.log("Conversation updated")
 						document.dispatchEvent(new Event("certainly_conversation_updated"))
 					}
 				});
@@ -243,7 +242,7 @@ certainly.renderPopups = function(messages, trigger){
 	if ( typeof(widget_status) != null && widget_status == "open" && trigger == "visitor_inactive"){
 		certainly.trace("Certainly Widget is open, the following popup will be sent as a message", messages)
 		messages.forEach(function(message){
-			console.log("sending message:", message)
+			//console.log("sending message:", message)
 			certainly.sendMessage(
 				{
 					sender: "bot",
