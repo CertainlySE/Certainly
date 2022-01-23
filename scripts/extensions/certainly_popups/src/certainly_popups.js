@@ -91,11 +91,11 @@ var checkExist = setInterval(function() {
 					certainly.initPopup(certainly_popups.to_render.page_load[0])
 				}
 
-				if (certainly_popups.to_render.page_load.length > 0) {
+				if (certainly_popups.to_render.visitor_inactive.length > 0) {
 					certainly.initPopup(certainly_popups.to_render.visitor_inactive[0])
 				}
 
-				if (certainly_popups.to_render.page_load.length > 0) {
+				if (certainly_popups.to_render.chat_minimized.length > 0) {
 					certainly.initPopup(certainly_popups.to_render.chat_minimized[0])
 				}
 
