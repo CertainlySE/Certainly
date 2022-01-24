@@ -61,6 +61,8 @@ gorgiasChat.init().then(function(GorgiasChat) {
 
     function showGorgiasChat() {
         document.querySelector("#custom-gorgias-style").innerHTML = `
+        @media(min-height:680px)
+        {
             #chat-window {
             margin: 0px 40px 55px 0px;
             height: 600px!important;
@@ -68,11 +70,13 @@ gorgiasChat.init().then(function(GorgiasChat) {
             left: unset!important;
             bottom: 90px!important;
             }
-            
+
             #chat-button {
                 bottom: 58px!important;
                 right: 36px!important;
-            }`;
+            }
+        }
+        `;
         }
     
 
