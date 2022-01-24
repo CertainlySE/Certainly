@@ -65,7 +65,7 @@ gorgiasChat.init().then(function(GorgiasChat) {
     function showGorgiasChat() {
         document.querySelector("#custom-gorgias-style").innerHTML = `
 
-        @media(min-height:680px) and (min-width:1200px)
+        @media(min-height:800px) and (min-width:1200px)
         {
             #chat-window {
             margin: 0px 40px 55px 0px;
