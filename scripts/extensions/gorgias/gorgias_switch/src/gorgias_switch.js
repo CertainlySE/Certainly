@@ -39,7 +39,7 @@ gorgiasChat.init().then(function(GorgiasChat) {
         if(!gorgias_style_injected) {
             document.querySelector("#chat-window").contentDocument.body.insertAdjacentHTML("beforeend", `
                 <style id="custom-gorgias-style">
-                .widget-xs {
+                .widget-xs, .widget-md, .widget-lg {
                     border-radius: 10px!important;
                 }
                 .chat-title {
@@ -53,7 +53,6 @@ gorgiasChat.init().then(function(GorgiasChat) {
                         top:0;
                         right:0;
                         left:unset;
-                        border-radius: 10px!important;
                     }
                 }   
                 
