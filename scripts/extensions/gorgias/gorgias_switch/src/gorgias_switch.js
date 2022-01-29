@@ -1,4 +1,3 @@
-
 // Hides the Gorgias Widget
 document.head.insertAdjacentHTML("beforeend", `
     <style id="custom-gorgias-style">
@@ -8,7 +7,7 @@ document.head.insertAdjacentHTML("beforeend", `
         </style>
 `)
 
-gorgiasChat.init().then(function(GorgiasChat) {
+GorgiasChat.init().then(function(GorgiasChat) {
     // Use GorgiasChat API now that the chat is fully initialized.
     var gorgias_style_injected = false;
 
@@ -108,7 +107,7 @@ gorgiasChat.init().then(function(GorgiasChat) {
 
                 showGorgiasChat();
 
-                GorgiasChat.on('widget:opened', function(data) {
+                GorgiasChat.on('widget:opened', function(data)  {
                     // your code should go here
                     injectGorgiasChatStyle();
                 })
@@ -122,6 +121,7 @@ gorgiasChat.init().then(function(GorgiasChat) {
 
             }
             else {
+                localStorage.removeItem("gorgias.chat-access-token")
                 console.log("Not showing Gorgias")
             }
         }
