@@ -1,0 +1,47 @@
+<script src="https://app.certainly.io/sdk/webchat.js"></script>
+
+<script>
+    var certainly_settings = // Certainly Widget Settings
+        {
+            id: "{{Certainly deployment bot ID}}",
+            mode: "clear_past_conversations",
+            debuggerMode: 1,
+            debug: true,
+            cvars: {
+                language: "en" // Can be passed dynamically by the site. This language will be used by the popups
+            },
+            right: 20,
+            bottom: 20,
+            buttonWidth: 60,
+            buttonHeight: 60
+        };
+
+    window.AnswersWidget.onLoaded(function() {
+        AnswersWidget.hide(); // Hides WixAnswers Widget
+        AnswersWidget.onWidgetClosed(showCertainly); // Shows Certainly Widget
+    });
+
+    certainly.getCertainlyTransfer({
+      actionName: "{{Certainly module}}}", // Number of your "Transfer to WixAnswers Chat Support" chatbot module
+      callback: (data) => goToChat(data)
+    });
+
+    function showCertainly () { // hide Wix Answers Widget and show Certainly Widget
+        AnswersWidget.hide();
+
+        certainly.widgetStatus({action: "show"});    
+        certainly.widgetStatus({action: "close"});
+    };
+
+    function goToChat (data) { // fill and go to contact form
+        certainly.widgetStatus({action: "hide"});
+
+        AnswersWidget.open();
+        AnswersWidget.show();
+        AnswersWidget.goToChat();
+        AnswersWidget.identifyUser({email: data.cvars.visitorEmail});
+        AnswersWidget.setCustomFields({name: data.cvars.visitorName});
+    };
+
+    initCertainlyWidget(certainly_settings);
+</script>
