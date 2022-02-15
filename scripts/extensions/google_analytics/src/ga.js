@@ -20,10 +20,11 @@ ga(function() {
 
 // Whenever Certainly moves to a new module, and cvar ga_event is defined, attempts to post that variable to Google Analytics
 // If the ga_event matches the last event sent, nothing is posted to Google Analytics
-    certainly.getCertainlyTransfer({
+whenDefined(window, 'certainly',
+function(){
+   certainly.getCertainlyTransfer({
     actionName: "*",
     callback: (data) => {
-      console.log("Ready")
       if (data.cvars == ""){
         console.log("You need to enable your Certainly bot to share custom variables with the website")
         return;
@@ -42,3 +43,4 @@ ga(function() {
       }
     }
   })
+});

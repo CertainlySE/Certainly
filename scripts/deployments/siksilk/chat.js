@@ -84,6 +84,7 @@ var certainlyChat = function() {
                 mode: "clear_past_conversations",
                 buttonLogoOpen: "https://s3.eu-central-1.amazonaws.com/botxo-assets-production/media/bot-images/a3e040da-f22.png",
                 buttonLogoClose: "https://s3.eu-central-1.amazonaws.com/botxo-assets-production/media/bot-images/a3e040da-f22.png",
+                inputType: "bottom",
                 //buttonWidth: 128,
                 gaEnabled: true,
                 chatStarted: false,
