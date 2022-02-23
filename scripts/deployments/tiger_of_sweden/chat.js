@@ -74,7 +74,6 @@ function launchChat(){
     script.id = "certainly-ga"
     script.addEventListener("load", function(event) {
         console.log("Loaded GA");
-        console.log("Estoy aqui");
     });
     script.src = "https://scripts.certainly.io/extensions/google_analytics/ga.js";
     document.getElementsByTagName('head')[0].appendChild(script);
