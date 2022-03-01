@@ -115,6 +115,7 @@ GorgiasChat.init().then(function(GorgiasChat) {
                 waitForElm('#botxo-chat-1').then((elm) => {
                     console.log(certainly)
                     certainly.widgetStatus({
+                        webchatKey: 1,
                         action: "hide"
                     })
                 });
@@ -129,6 +130,7 @@ GorgiasChat.init().then(function(GorgiasChat) {
     });
 
     certainly.getCertainlyTransfer({
+        webchatKey: 1,
         actionName: "*",
         callback: function(data) {
             if (data.cvars == "") {
@@ -146,12 +148,14 @@ GorgiasChat.init().then(function(GorgiasChat) {
                     injectGorgiasChatStyle();
                     // Hides the Certainly Widget
                     certainly.widgetStatus({
+                        webchatKey: 1,
                         action: "hide"
                     })
                 }
 
                 // Resets the "gorgias" cvar
                 certainly.sendCvars({
+                    webchatKey: 1,
                     custom_vars: {
                         gorgias: ""
                     }

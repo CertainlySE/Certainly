@@ -220,6 +220,13 @@ var previous_data = "";
         module: "656050",
         webchatKey: "1"
     })
+        if (certainly_settings.cvars.current_product_recommendations == "true"){
+        certainly.goTo({
+            module: "656049",
+            webchatKey: "1"
+        })
+        scrollToRelatedProducts();
+    }
 }
 
 

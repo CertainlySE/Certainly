@@ -8,7 +8,8 @@ var certainly_settings = {
       ad_preferences: ad_preferences,
     },
   }
-  
+ 
+/*
 var chat_started = false;
 
 certainly.getCertainlyTransfer({
@@ -38,3 +39,4 @@ function geocode(){
         console.log("IP Address unvailable");
     });
 }
+*/
