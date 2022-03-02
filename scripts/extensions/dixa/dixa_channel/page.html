@@ -2,9 +2,6 @@
 	<head>
 	</head>
 	<body>
-		<iframe src="https://certainly.io/customer-service" style="width:100%;height:100%;" frameBorder="0"></iframe>
-
-
 		<!--Dixa Chat Widget Start-->
 		<script>
 		!function(e,t,a,i,d,s,n,r){e._dixa=e._dixa||function(){(e._dixa.q=e._dixa.q||[]).push(arguments),e._dixa.handler&&e._dixa.handler(arguments)},e._dixa.l=1*new Date,e._dixa.wid="011e32bb-d03b-414a-a2de-7ea8e3c0bae4",n=t.createElement(a),r=t.getElementsByTagName(a)[0],n.async=1,n.setAttribute("charset","utf-8"),n.src="https://widget.dixa.io/assets/scripts/javascript/loader.js",r.parentNode.insertBefore(n,r)}(window,document,"script")
@@ -15,27 +12,26 @@
 		<!--Certainly Widget Start-->
 		<script src="https://app.certainly.io/sdk/webchat.js"></script>
 		<script>
-		initCertainlyWidget({
+		var certainly_settings ={
 			id: "20ed2c64-4f05-472e-83aa-c160717cfbec",
-			right: 300,
 			cvars: {
 				// You can pass metadata to Certainly
 			},
-			inputType: "bottom"
-		});
+			inputType: "bottom",
+			// Messages that will be rendered when a change on Dixa's end occurs
+			dixa_events: {
+				takeover_module: "588630",
+				agent_joined_message: "An agent has joined the conversation",
+				bot_joined_message: "Bot has joined the conversation",
+				agent_left_message: "An agent has left the conversation",
+				bot_left_message: "Bot has left the conversation"
+			}
+		}
+
+		initCertainlyWidget(certainly_settings);
 		</script>
 		<!--Certainly Widget End-->
 
-		<script>
-		// Optional
-		var dixa_events = {
-			takeover_module: "588630",
-			agent_joined_message: "---- An agent has joined the conversation ----",
-			bot_joined_message: "---- Bot has joined the conversation ----",
-			agent_left_message: "---- An agent has left the conversation ----",
-			bot_left_message: "---- Bot has left the conversation ----"
-			}
-		</script>
 
 		<!--Dixa extension for Certainly Start-->
 		<script src="/src/dixa.js"></script>

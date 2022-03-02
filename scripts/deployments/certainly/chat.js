@@ -9,7 +9,7 @@ var certainly_settings = {
     },
   }
  
-/*
+
 var chat_started = false;
 
 certainly.getCertainlyTransfer({
@@ -33,10 +33,10 @@ function geocode(){
             custom_vars: {
                 visitor_ip: data.ip,
                 visitor_country: data.country_name
-            }
+            },
+            openChat: false
         })
     }).catch(function() {
         console.log("IP Address unvailable");
     });
 }
-*/

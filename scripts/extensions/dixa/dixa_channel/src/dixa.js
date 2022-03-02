@@ -1,8 +1,10 @@
 var dixa_settings = {
-	dixa_metadata: "",
-	current_dixa_agent_id: "",
-	current_dixa_user_id: "",
+	metadata: "",
+	agent_id: "",
+	user_id: "",
 	previous_visitor_message: "",
+	previous_agent_message: "",
+	previous_event: ""
 }
 
 _dixa("api.showWidget", "{\"show_widget\":false, \"show_contact_form\":false}");
@@ -20,15 +22,14 @@ document.head.append(style);
 */
 
 function synchDixa(){
-	dixa_settings.dixa_metadata = JSON.parse(localStorage.getItem("dixa-widget"))
-	console.log("meta", dixa_settings.dixa_metadata)
-	if(dixa_settings.dixa_metadata != null){
-		if (dixa_settings.dixa_metadata.conversation.currentConversation){
-			dixa_settings.current_dixa_user_id = dixa_settings.dixa_metadata.user.currentUser.id; 
-			if (dixa_settings.dixa_metadata.conversation.assignedAgent){				
-				dixa_settings.current_dixa_agent_id = dixa_settings.dixa_metadata.conversation.assignedAgent.agent_id 
+	dixa_settings.metadata = JSON.parse(localStorage.getItem("dixa-widget"))
+	console.log("meta", dixa_settings.metadata)
+	if(dixa_settings.metadata != null){
+		if (dixa_settings.metadata.conversation.currentConversation){
+			dixa_settings.user_id = dixa_settings.metadata.user.currentUser.id; 
+			if (dixa_settings.metadata.conversation.assignedAgent){				
+				dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.agent_id 
 			}
-			 
 		} 
 	}
 }
@@ -59,12 +60,27 @@ _dixa(
 	"onAgentAssigned",
 	function(payload){
 		console.log("Agent joined: ", payload)
-		dixa_settings.current_dixa_agent_id = payload.agent.id;
-		if (dixa_events && dixa_events.agent_joined_message){
+		dixa_settings.agent_id = payload.agent.id;
+		if (certainly_settings.dixa_events && certainly_settings.dixa_events.agent_joined_message && dixa_settings.previous_event != payload){
+			dixa_settings.previous_event = payload;
 			certainly.sendMessage(
 				{
-					sender: "bot", // Required
-					message: dixa_events.agent_joined_message, // Required
+					sender: "bot",
+					message: [
+						{
+							type: "card",
+							cards: [
+								{
+									title: "",
+									text: certainly_settings.dixa_events.agent_joined_message,
+									is_shareable: false,
+									image_source_url: "",
+									image_destination_url: "",
+									buttons: []
+								}
+							]
+						}
+					],
 					webchatKey: "1", // Only required if specified in initCertainlyWidget()
 				}
 			)
@@ -83,11 +99,26 @@ _dixa(
 	"onAgentUnassigned",
 	function(payload){
 		console.log("Agent left: ", payload)
-		if (dixa_events && dixa_events.agent_left_message){
+		if (certainly_settings.dixa_events && certainly_settings.dixa_events.agent_left_message && dixa_settings.previous_event != payload){
+			dixa_settings.previous_event = payload;
 			certainly.sendMessage(
 				{
 					sender: "bot", // Required
-					message: dixa_events.agent_left_message, // Required
+					message: [
+						{
+							type: "card",
+							cards: [
+								{
+									title: "",
+									text: certainly_settings.dixa_events.agent_left_message,
+									is_shareable: false,
+									image_source_url: "",
+									image_destination_url: "",
+									buttons: []
+								}
+							]
+						}
+					],
 					webchatKey: "1", // Only required if specified in initCertainlyWidget()
 				}
 			)
@@ -106,21 +137,34 @@ _dixa(
 	"onConversationEnded",
 	function(){
 		console.log("Conversation ended");
-		if (dixa_events && dixa_events.agent_left_message){
+		if (certainly_settings.dixa_events && certainly_settings.dixa_events.agent_left_message && dixa_settings.previous_event != "chat_ended"){
+			dixa_settings.previous_event = "chat_ended";
 			certainly.sendMessage(
 				{
-					sender: "bot", // Required
-					message: dixa_events.agent_left_message, // Required
-					webchatKey: "1", // Only required if specified in initCertainlyWidget()
+					sender: "bot",
+					message: [
+						{
+							type: "card",
+							cards: [
+								{
+									title: "",
+									text: certainly_settings.dixa_events.agent_left_message,
+									is_shareable: false,
+									image_source_url: "",
+									image_destination_url: "",
+									buttons: []
+								}
+							]
+						}
+					]
 				}
-			),
-			function(){
-				certainly.goTo(
-					{
-						module: dixa_events.bot_takeover, // Required
-						webchatKey: "1" // Only required if specified in initCertainlyWidget()
-					});				
-			}
+			);
+			certainly.goTo(
+			{
+				module: certainly_settings.dixa_events.takeover_module,
+				webchatKey: 1
+			});					
+			
 		}
 	}
 );
@@ -134,10 +178,10 @@ When a new human agent message is exposed by Dixa, posts it to Certainly
 */
 
 var dixaChatInterval = window.setInterval(function() {
-	synchDixa();
-	if (dixa_settings.dixa_metadata.conversation.currentConversation != null) {
+	if (dixa_settings.metadata != null && dixa_settings.metadata.conversation.currentConversation != null) {
+		synchDixa();
 		window.clearInterval(dixaChatInterval);
-		if(dixa_settings.dixa_metadata.conversation.closing){
+		if(dixa_settings.metadata.conversation.closing){
 		}
 		trackDixaChat();
 	}
@@ -149,8 +193,14 @@ function trackDixaChat(){
 		"onMessageAdded",
 		function(payload){						
 			console.log("Message added: ", payload)
-			if (payload.author.id != dixa_settings.current_dixa_user_id && payload.author.name != "dixa-bot"){
+			dixa_settings.metadata = JSON.parse(localStorage.getItem("dixa-widget"))
+			dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.agent_id
+			if (dixa_settings.agent_id == null) {
+				dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.id
+			}
+			if (payload.author.id == dixa_settings.agent_id && payload.author.name != "dixa-bot" && payload.message.text != dixa_settings.previous_agent_message){
 				console.log("Sending human agent message to Certainly")
+				dixa_settings.previous_agent_message = payload.message.text;
 				// First, simulates a "Bot is typing" event
 				var messageWaitingTime = 125 * payload.message.text.length; // In ms
 				certainly.sendMessage(
@@ -215,7 +265,8 @@ certainly.getCertainlyTransfer({
 						certainly.sendCvars({
 							custom_vars: {
 									dixa: ""
-							}
+							},
+							openChat: false
 						})
 					}
 				}
