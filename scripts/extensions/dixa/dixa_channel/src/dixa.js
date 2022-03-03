@@ -7,6 +7,8 @@ var dixa_settings = {
 	previous_event: ""
 }
 
+console.log("Hello")
+
 _dixa("api.showWidget", "{\"show_widget\":false, \"show_contact_form\":false}");
 /*
 Hides permanently the Dixa Widget
@@ -193,11 +195,14 @@ function trackDixaChat(){
 		"onMessageAdded",
 		function(payload){						
 			console.log("Message added: ", payload)
-			dixa_settings.metadata = JSON.parse(localStorage.getItem("dixa-widget"))
-			dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.agent_id
-			if (dixa_settings.agent_id == null) {
-				dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.id
+			if (dixa_settings.agent_id == "") {
+				dixa_settings.metadata = JSON.parse(localStorage.getItem("dixa-widget"))
+				dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.agent_id
+				if (dixa_settings.agent_id == null) {
+					dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.id
+				}
 			}
+			
 			if (payload.author.id == dixa_settings.agent_id && payload.author.name != "dixa-bot" && payload.message.text != dixa_settings.previous_agent_message){
 				console.log("Sending human agent message to Certainly")
 				dixa_settings.previous_agent_message = payload.message.text;

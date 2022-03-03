@@ -1,26 +1,10 @@
 const CERTAINLY_POPUPS = [
     {
-        id: "visitor_inactive", 
-        trigger: "visitor_inactive", 
-        condition: true, 
-        delay: 20000, 
-        repeat_after: 5, 
-        desktop: true, 
-        mobile: true, 
-        messages: [{
-            language: "en", 
-            texts: [
-                "Do you need help with anything?"
-            ]
-        }],
-        start_from_module: "", 
-    },
-    {
         id: "chat_minimized",
         trigger: "chat_minimized", 
         condition: true,
         delay: 5000,
-        repeat_after: 1, 
+        repeat_after: 5, 
         desktop: true, 
         mobile: true, 
         messages: [{
