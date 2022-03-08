@@ -26,7 +26,7 @@ const CERTAINLY_POPUPS = [
         messages: [{
             language: "en", 
             texts: [
-                "I am there if you have any questions!"
+                "I am there if you\nhave any questions!"
             ]
         }],
         start_from_module: "", 

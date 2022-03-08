@@ -271,7 +271,7 @@ certainly.renderPopups = function(messages, trigger){
 	certainly.trace("Rendering popups", messages);
 	for (let i = 0; i < messages.length; i++) {
 		var message_html = `<li class="certainly-message">
-				<div class="certainly-bubble" title="Chatbot wrote: ${messages[i]}">${messages[i]}</div>
+				<div class="certainly-bubble" title="Chatbot wrote: ${messages[i]}">${messages[i].replace(/\n/g,' <br>')}</div>
 			</li>`;
 		document.querySelector("#certainly-popups").insertAdjacentHTML('beforeend', message_html);
 		// Attaches a click event listener to the latest rendered message bubble

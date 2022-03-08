@@ -274,6 +274,7 @@ certainly.getCertainlyTransfer({
 							openChat: false
 						})
 					}
+					trackDixaChat();
 				}
 
 				if (data.cvars.dixa && data.cvars.dixa == "send_message") {
