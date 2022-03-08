@@ -31,6 +31,9 @@ function synchDixa(){
 			dixa_settings.user_id = dixa_settings.metadata.user.currentUser.id; 
 			if (dixa_settings.metadata.conversation.assignedAgent){				
 				dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.agent_id 
+				if (dixa_settings.agent_id == null){				
+					dixa_settings.agent_id = dixa_settings.metadata.conversation.assignedAgent.id 
+				}
 			}
 		} 
 	}
