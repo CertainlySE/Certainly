@@ -73,7 +73,7 @@ function launchChat(){
     script.type = "text/javascript";
     script.id = "certainly-ga"
     script.addEventListener("load", function(event) {
-        console.log("Loaded GA");
+        //console.log("Loaded GA");
     });
     script.src = "https://scripts.certainly.io/extensions/google_analytics/ga.js";
     document.getElementsByTagName('head')[0].appendChild(script);
@@ -107,7 +107,7 @@ function launchChat(){
             //debuggerMode: 1,
             //debug: true
         }
-        console.log(certainly_settings)
+        //console.log(certainly_settings)
         // ######## End of Certainly chatbot configuration object ########
 
 
@@ -163,9 +163,9 @@ function launchChat(){
             }
         });
 
-      
-whenDefined(window, 'certainly_ready',
-    function(){        
+
+window.addEventListener('certainly_popups_ready',
+    function (e) {   
         certainly.getCertainlyTransfer({
             actionName: "*",
             callback: function (data){
@@ -179,7 +179,7 @@ var previous_data = "";
   function conversationUpdated(data){
         //console.log(data)
         previous_data = data;
-
+    
         if (data.cvars.web_action == "select_size" && previous_web_action != "select_size" && typeof(data.cvars.recommended_size) != null){
             certainly.sendCvars({
                 custom_vars: {
@@ -246,7 +246,7 @@ var previous_data = "";
 
 
   function selectSize(cvars){
-    console.log("trying to select ", cvars.recommended_size)
+    //console.log("trying to select ", cvars.recommended_size)
     var sizeFound = false;
   
     var sizeOptions = document.getElementsByClassName("sp-opt");
@@ -257,7 +257,6 @@ var previous_data = "";
                 setTimeout(function() {
                     certainly.goTo({
                         module: "656041",
-                        webchatKey: "1",
                         cvars: {
                             "current_variant_id": document.querySelectorAll("#pid")[0].value
                         }
