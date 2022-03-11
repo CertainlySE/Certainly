@@ -257,7 +257,7 @@ var previous_data = "";
                 setTimeout(function() {
                     certainly.goTo({
                         module: "656041",
-                        
+                        webchatKey: "1",
                         cvars: {
                             "current_variant_id": document.querySelectorAll("#pid")[0].value
                         }
