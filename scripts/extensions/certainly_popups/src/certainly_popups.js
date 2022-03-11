@@ -1,6 +1,13 @@
 //Small utility function to listen for when an object is defined
 (function(){window.whenDefined=function(a,b,c){a[b]?c():Object.defineProperty(a,b,{configurable:!0,enumerable:!0,writeable:!0,get:function(){return this["_"+b]},set:function(a){this["_"+b]=a,c()}})}}).call(this);
 
+(function() {
+    
+	var url = new URL(window.location.href);
+	// Killer switch for the chat
+	if (url.searchParams.get('disableCertainly')) {
+			return
+	} else {
 var checkExist = setInterval(function() {
 	if (certainly && certainly_settings && certainly_settings.cvars) {
 		 clearInterval(checkExist);
@@ -305,13 +312,12 @@ certainly.renderPopups = function(messages, trigger){
 					certainly_settings,
 					function(){
 						certainly.minimize();
-						window.certainly_ready = true;
-						window.dispatchEvent(new Event('certainly_ready'));
+						window.dispatchEvent(new Event('certainly_popups_ready'));
 					}
 				)
 			}
 		);
-
-
 }
-}, 100); 
+}, 100);
+
+}})()
