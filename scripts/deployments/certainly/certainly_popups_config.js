@@ -18,16 +18,19 @@ const CERTAINLY_POPUPS = [
     {
         id: "free-trial",
         trigger: "page_load",
-        condition: true,
+        condition: (function(){
+            if (window.location.href.includes("free-trial")){
+                return true;
+            }
+        })(),
         delay: 5000,
-        repeat_after: 5,
+        repeat_after: 2,
         desktop: true,
         mobile: true,
         messages: [{
             language: "en",
             texts: [
-                "The 14-day free trial grants you full access to all of the features. No credit card is needed.",
-                "Fill in your details on this page in order to start your trial!"
+                "Please fill in your details on\nthis form in order to start your trial!",
             ]
         }],
         start_from_module: "722641",
@@ -35,24 +38,31 @@ const CERTAINLY_POPUPS = [
     {
         id: "book-a-demo",
         trigger: "page_load",
-        condition: true,
+        ondition: (function(){
+            if (window.location.href.includes("demo")){
+                return true;
+            }
+        })(),
         delay: 5000,
-        repeat_after: 5,
+        repeat_after: 2,
         desktop: true,
         mobile: true,
         messages: [{
             language: "en",
             texts: [
-                "One of our team members will give you a tour of the platform 🚀",
-                "Please fill out the form below, and we will contact you to arrange a meeting"
+                "Please fill out the form below and we\nwill contact you to arrange a meeting.",
             ]
         }],
         start_from_module: "722645",
     },
     {
-        id: "customer_storied",
+        id: "customer_stories",
         trigger: "page_load",
-        condition: true,
+        ondition: (function(){
+            if (window.location.href.includes("customers")){
+                return true;
+            }
+        })(),
         delay: 5000,
         repeat_after: 5,
         desktop: true,
@@ -60,7 +70,7 @@ const CERTAINLY_POPUPS = [
         messages: [{
             language: "en",
             texts: [
-                "I hope you find our customer stories interesting 😍"
+                "Do not hesitate to read our customer's stories\nand learn more about their journeys.",
             ]
         }],
         start_from_module: "",
@@ -68,16 +78,19 @@ const CERTAINLY_POPUPS = [
     {
         id: "careers",
         trigger: "page_load",
-        condition: true,
+        ondition: (function(){
+            if (window.location.href.includes("careers")){
+                return true;
+            }
+        })(),
         delay: 5000,
-        repeat_after: 5,
+        repeat_after: 2,
         desktop: true,
         mobile: true,
         messages: [{
             language: "en",
             texts: [
-                "I hope you find our job oppenings interesting 😍",
-                "Remember that if you can't find your dream job among the ones listed here, you can always send us an unsolicited application at hello@certainly.io"
+                "Interested in growing as a profesional at Certainly?",
             ]
         }],
         start_from_module: "722648",
@@ -94,7 +107,7 @@ const CERTAINLY_POPUPS = [
             language: "en",
             texts: [
                 "Hi! 😊",
-                "Curious to know how much revenue Certainly can generate for you?"
+                "Curious to know how\nmuch revenue Certainly\ncan generate for you?"
             ]
         }],
         start_from_module: "",
