@@ -38,7 +38,7 @@ const CERTAINLY_POPUPS = [
     {
         id: "book-a-demo",
         trigger: "page_load",
-        ondition: (function(){
+        condition: (function(){
             if (window.location.href.includes("demo")){
                 return true;
             }
@@ -58,7 +58,7 @@ const CERTAINLY_POPUPS = [
     {
         id: "customer_stories",
         trigger: "page_load",
-        ondition: (function(){
+        condition: (function(){
             if (window.location.href.includes("customers")){
                 return true;
             }
@@ -78,7 +78,7 @@ const CERTAINLY_POPUPS = [
     {
         id: "careers",
         trigger: "page_load",
-        ondition: (function(){
+        condition: (function(){
             if (window.location.href.includes("careers")){
                 return true;
             }
