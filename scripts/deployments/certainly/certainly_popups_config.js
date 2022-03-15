@@ -50,7 +50,7 @@ const CERTAINLY_POPUPS = [
         messages: [{
             language: "en",
             texts: [
-                "Please fill out the form below and we\nwill contact you to arrange a meeting.",
+                "Please fill out the form below and we\nwill contact you to arrange a meeting 😊",
             ]
         }],
         start_from_module: "722645",
@@ -70,7 +70,7 @@ const CERTAINLY_POPUPS = [
         messages: [{
             language: "en",
             texts: [
-                "Do not hesitate to read our customer's stories\nand learn more about their journeys.",
+                "Do not hesitate to read our customer stories\nand learn more about their journeys.",
             ]
         }],
         start_from_module: "",
@@ -90,7 +90,7 @@ const CERTAINLY_POPUPS = [
         messages: [{
             language: "en",
             texts: [
-                "Interested in growing as a profesional at Certainly?",
+                "Interested in growing as a professional at Certainly?",
             ]
         }],
         start_from_module: "722648",
