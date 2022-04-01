@@ -13,15 +13,14 @@ var certainly_ga = {
 
 
 function postEvent(ga_event){
-  if (ga_event != certainly_ga.last_sent_event) {
-    // The event is different from the last one
-    certainly_ga.last_sent_event = ga_event;
-
     var event = ga_event;
-    
-    if ( /.*\{.*\}.*/.test(event) ){
+    console.log(typeof(event))
+    console.log(ga_event, ( /.*\{*\}.*/.test(ga_event) ))
+    if ( /.*\{*\}.*/.test(ga_event) ){
+      // cvar is set to be a dictionary {...} instead of a plain string
       event = JSON.parse(ga_event);
     }
+    console.log("About to post", ga_event)
     /* event will have either of the following values
     event = "certainly_chat_started" (type is "string")
     event = {
@@ -35,53 +34,39 @@ function postEvent(ga_event){
     
     This has implications over how the variable event needs to be posted to GA
     */
-    if (typeof(ga)!="undefined") { // Sending an event via ga.js
-      var trackers = ga.getAll();
-      certainly_ga.tracker = trackers[0];
-      
-      if ( event.typeof(event) == "string" ){
-        certainly_ga.tracker.send("event", {
-          eventCategory: "certainly",
-          eventAction: event
-        });
-      }
-      else if ( typeof(event) == "object" ){
-        if (!event.eventAction){
-          console.log("The label for this event is not defined", event)
-          return
+    switch( typeof(event) ) {
+      case "string":
+        if (typeof(ga)!="undefined") { // Sending an event via ga.js
+          var trackers = ga.getAll();
+          certainly_ga.tracker = trackers[0];
+          certainly_ga.tracker.send("event", {
+            eventCategory: "certainly",
+            eventAction: event
+          });
         }
-        else {
+        else if ( typeof(gtag)!="undefined" ) { // Sending an event via gtag.js
+            gtag("event", event, {});
+          }
+        break;
+      case "object":
+        if (typeof(ga)!="undefined") { // Sending an event via ga.js
+          var trackers = ga.getAll();
+          certainly_ga.tracker = trackers[0];
           certainly_ga.tracker.send("event", event);
         }
-        
-      }          
-    }
-    else if ( typeof(gtag)!="undefined" ) { // Sending an event via gtag.js
-      if ( typeof(event) == "string" ){
-        gtag("event", event, {});
-      }
-      else if ( typeof(event) == "object" ){
-        if (!event.eventAction){
-          console.log("The label for this event is not defined", event)
-          return
-        }
-        else {
-          gtag('event', event.eventAction ? event.eventAction : event.eventLabel,
+        else if ( typeof(gtag)!="undefined" ) { // Sending an event via gtag.js
+          gtag('event', event.eventAction ? event.eventAction : "undefined",
             {
               'event_category': event.eventCategory ? event.eventCategory : "certainly",
               'event_action': event.eventAction
             }
           );
         }
-        
-      }
-      
+        break;
+      default:
+        console.log("Certainly could not send an event to Google Analytics. No tracker was found", ga_event)
     }
-    
-    else {
-      console.log("Certainly could not send an event to Google Analytics. No tracker was found", ga_event)
-    }
-  }
+  
 }
 
 // Whenever Certainly moves to a new module, and cvar ga_event is defined, attempts to post that variable to Google Analytics
@@ -98,7 +83,12 @@ whenDefined(window, 'certainly',
         }
         if (data.cvars.ga_event) { 
           // An event is defined as a cvar
-          postEvent(data.cvars.ga_event)
+          var ga_event = data.cvars.ga_event;
+          if (ga_event != certainly_ga.last_sent_event) {
+            // The event is different from the last one            
+            postEvent(ga_event)
+            certainly_ga.last_sent_event = ga_event;
+          }
       }
     }
   })

@@ -4,7 +4,7 @@ var certainly_settings = {}; // Global variable
     
     var url = new URL(window.location.href);
     // Killer switch for the chat
-    if (url.searchParams.get('disableBot')) {
+    if (url.searchParams.get('disableBot') || url.href.includes("tigerofsweden.com/se") || url.href.includes("tigerofsweden.com/gb")) {
         return
     } else {
     // Loads the chat
