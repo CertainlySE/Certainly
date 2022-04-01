@@ -241,7 +241,12 @@ var checkExist = setInterval(function() {
 
 // Method that renders popup texts, after the popups have been initialized
 certainly.renderPopups = function(messages, trigger){
-	var widget_status = localStorage.getItem("statusWebchat-1");
+	if (typeof(certainly_settings.webchatKey) != null){
+		var widget_status = localStorage.getItem(`statusWebchat-${certainly_settings.webchatKey}`);
+	}
+	else  {
+		var widget_status = localStorage.getItem("statusWebchat-1");
+	}
 	if ( typeof(widget_status) != null && widget_status == "open" && trigger != "visitor_inactive"){
 		certainly.trace("Certainly Widget is open, the following popups will not be rendered", messages)
 		return;
