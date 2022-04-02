@@ -241,7 +241,7 @@ var checkExist = setInterval(function() {
 
 // Method that renders popup texts, after the popups have been initialized
 certainly.renderPopups = function(messages, trigger){
-	if (typeof(certainly_settings.webchatKey) != null){
+	if (typeof(certainly_settings.webchatKey) != 'undefined'){
 		var widget_status = localStorage.getItem(`statusWebchat-${certainly_settings.webchatKey}`);
 	}
 	else  {
