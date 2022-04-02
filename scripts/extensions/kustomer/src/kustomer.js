@@ -20,6 +20,8 @@ function waitForElm(selector) {
 }
 
 waitForElm('#kustomer-ui-sdk-iframe').then((elm) => {
+
+  
   // Hides the Kustomer Widget
   certainly.hideKustomer = function(){
   document.head.insertAdjacentHTML("beforeend", `
