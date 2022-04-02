@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<!-- START OF INIT CERTAINLY WIDGET -->
+<script src="https://app.certainly.io/sdk/webchat.js">
+</script>
+<script>
+initCertainlyWidget({
+  	id: "your_chat_id",
+  	webchatKey: "certainly",
+	mode: "clear_past_conversations",
+	debuggerMode: 1,
+	debug: true,
+	cvars: {
+		language: "en" // Can be passed dynamically by the site. This language will be used by the popups
+	},
+	right: 30,
+    bottom: 30
+});
+</script>
+<!-- END OF INIT CERTAINLY WIDGET -->
+
+<!-- START OF INIT KUSTOMER WIDGET -->
+<script
+  	src="https://cdn.kustomerapp.com/chat-web/widget.js"
+  	data-kustomer-api-key='your_kustomer_api_key';>
+</script>
+
+<script src="your_web_sdk_file"></script> <!-- Add Web SDKs JS file here (i.e. "./kustomer_live_chat.js") -->
+
+<!-- END OF INIT KUSTOMER WIDGET -->
+
+</body>
+</html>
