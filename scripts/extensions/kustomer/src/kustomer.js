@@ -107,13 +107,6 @@ certainly.getCertainlyTransfer({
 
             
 
-              
-              console.log("Hiding Certainly")
-              // Hides the Certainly Widget
-              certainly.widgetStatus({
-                  webchatKey: 1,
-                  action: "hide"
-              })
 
               certainly.sendCvars({
                 webchatKey: 1,
@@ -121,10 +114,6 @@ certainly.getCertainlyTransfer({
                     kustomer: ""
                 }
               })
-
-              // Hides Certainly chat manually
-              document.getElementById("botxo-iframeContainer-1").style.display = "none";
-              document.getElementById("botxo-button-1").style.display = "none";
           }
           
       }
