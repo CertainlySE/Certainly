@@ -1,45 +1,67 @@
-/* Utility function */
-function waitForElm(selector) {
-  return new Promise(resolve => {
-      if (document.querySelector(selector)) {
-          return resolve(document.querySelector(selector));
-      }
-
-      const observer = new MutationObserver(mutations => {
-          if (document.querySelector(selector)) {
-              resolve(document.querySelector(selector));
-              observer.disconnect();
-          }
-      });
-
-      observer.observe(document.body, {
-          childList: true,
-          subtree: true
-      });
-  });
+var kustomer_settings = {
+	metadata: "",
+	agent_id: "",
+	user_id: "",
+	previous_visitor_message: "",
+	previous_agent_message: "",
+	previous_event: ""
 }
 
-waitForElm('#kustomer-ui-sdk-iframe').then((elm) => {
-
-  
-  // Hides the Kustomer Widget
-  certainly.hideKustomer = function(){
-  document.head.insertAdjacentHTML("beforeend", `
-  <style id="custom-kustomer-style">
-     #kustomer-ui-sdk-iframe {
-          display:none!important;
-      }
-      </style>
-  `)}
-
-  certainly.hideKustomer();
-
-  certainly.showKustomer = function(){
-    document.querySelector("#custom-kustomer-style").remove();
-  }
-  
+KustomerCore.init({
+  brandId: kustomer_brand_id,
+}, function (chatSettings) {
+  KustomerCore.getConversations({}, function (res, error) {
+    console.log('Fetched conversations!', res.conversations);
+  });
 });
 
+
+
+KustomerCore.addListener('onAgentTypingActivity', (response, error) => {
+  console.log(response);
+  // Send an is typing event to Certainly
+});
+
+KustomerCore.addListener('onMessageReceived', (response, error) => {
+  console.log(response);
+   // Post agent reply to Certainly
+});
+
+KustomerCore.addListener('onConversationEnded', (response, error) => {
+  console.log(response);
+   // Moves bot to takeover module
+  
+		if (certainly_settings.dixa_events && certainly_settings.dixa_events.agent_left_message && dixa_settings.previous_event != "chat_ended"){
+			dixa_settings.previous_event = "chat_ended";
+			certainly.sendMessage(
+				{
+					sender: "bot",
+					message: [
+						{
+							type: "card",
+							cards: [
+								{
+									title: "",
+									text: certainly_settings.dixa_events.agent_left_message,
+									is_shareable: false,
+									image_source_url: "",
+									image_destination_url: "",
+									buttons: []
+								}
+							]
+						}
+					]
+				}
+			);
+			certainly.goTo(
+			{
+				module: certainly_settings.dixa_events.takeover_module,
+				webchatKey: 1
+			});					
+			
+		}
+	
+});
 
 certainly.getCertainlyTransfer({
   webchatKey: 1,
@@ -54,16 +76,18 @@ certainly.getCertainlyTransfer({
               /*GorgiasChat.captureUserEmail(data.cvars.customer_email);
               GorgiasChat.open()*/
 
-              Kustomer.describeCustomer({
-                attributes: {
-                  emails: [data.cvars.customer_email]
-                }
-              });
-              
-              certainly.chat_history = data.cvars.chatHistory;
+              if (typeof(data.cvars.visitor_email) != 'undefined'){
+                KustomeCorer.describeCustomer({
+                  attributes: {
+                    emails: [data.cvars.customer_email]
+                  }
+                });
+              }
 
-              Kustomer.addListener('onConversationCreate', (res) => {
-                Kustomer.describeConversation({
+              certainly.chat_history = data.cvars.chatHistory;
+              // Describes a conversation when a conversation is created
+              KustomerCore.addListener('onConversationCreate', (res) => {
+                KustomerCore.describeConversation({
                   conversationId: res.conversationId,
                   customAttributes: {
                     certainlyHistoryTxt: certainly.chat_history ? certainly.chat_history : "The transcript between Certainly and this visitor is not available"
@@ -71,14 +95,17 @@ certainly.getCertainlyTransfer({
                 });
               });
 
-              Kustomer.open(
-                function(){
-                  Kustomer.createConversation({  
-                    message: "One agent will join as soon as possible"
-                  })
-                }
-              );
-              certainly.showKustomer();
+              // Create a new conversation on Kustomer
+              kustomerCore.createConversation(
+                {
+                  title: `Chat between Certainly and ${data.cvars.visitor_name}`,
+                  brand: kustomer_brand_id
+                },
+                (response, error) => {
+                  console.log('Session was created!');
+                })
+
+            
 
               
               console.log("Hiding Certainly")
@@ -101,40 +128,12 @@ certainly.getCertainlyTransfer({
           }
           
       }
+      if (data.cvars.kustomer && data.cvars.kustomer == "send_message") {
+        console.log("Posting chat message on Kustomer")
+        if (data.cvars.visitor_message != kustomer_settings.previous_visitor_message){
+          window._dixa('api.setMessage', data.cvars.visitor_message);
+          kustomer_settings.previous_visitor_message = data.cvars.visitor_message
+        }
+      }
   }
 });
-
-/*certainly.getCertainlyTransfer({
-  actionName: "bot_module_id_for_kustomer_widget_switch",
-  webchatKey: "certainly",
-  callback: (data) => goToChat(data) // The data object contains information such as the latest visitor message and custom variables
-});
-  
-function goToChat (data) { // fill and go to contact form
-    certainly.widgetStatus({action: "hide", webchatKey: "certainly"});
-
-    Kustomer.start({
-        brandId: 'your_kustomer_brand_id'
-      }, function () {
-          const onCloseHandler = function() {
-              certainly.widgetStatus({action: "show", webchatKey: "certainly"});
-              certainly.widgetStatus({action: "close", webchatKey: "certainly"});
-
-              certainly.goTo({
-                  module: "bot_module_id_for_certainly_widget_switch", // Required
-                  webchatKey: "certainly", // Only required if specified in initCertainlyWidget()
-                },
-                // callback //Function (optional)
-              );
-
-          };
-          Kustomer.addListener('onClose', onCloseHandler);
-        }
-    );
-    Kustomer.open();
-    setTimeout(() => {
-        Kustomer.createConversation({
-          message: data.cvars.chatHistory
-        })
-    }, 1000);
-};*/
