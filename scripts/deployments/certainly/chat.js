@@ -1,5 +1,5 @@
-
 var ad_preferences = localStorage.getItem("certainly-preferences") ? JSON.parse(localStorage.getItem("certainly-preferences")).ad_storage : "rejected"; // This is checking if the customer accepted marketing cookies. We hardcode the value to granted for test purposes, but for the live website we need to change it to "JSON.parse(localStorage.getItem("certainly-preferences")).ad_storage"
+
 
 window.certainly_settings = {
 	id: "93c195ef-d163-4511-8494-9834408e0e0f",
@@ -62,11 +62,18 @@ function conversationUpdated(data){
     previous_data = data;
     if (data.cvars.web_action == "open_url" && previous_web_action != "open_url" && typeof(data.cvars.url) != null){
         var destination_url = data.cvars.url;
-        if (destination_url.includes("certainly.io")) {
-            window.location.href = destination_url;
-        }
-        else { //In case the URL specified in the cvar is a relative path
-            window.location.href = `${window.location.origin}/${destination_url}`
+        if (destination_url.includes("https") && destination_url.includes("certainly.io")) {
+			setTimeout(function(){
+            			window.location.href = destination_url;
+			}, 2500);
+        } else if (destination_url.includes("https")) {
+			setTimeout(function NewTab() {
+            			window.open(destination_url, "_blank");
+        		}, 2500);
+        } else { //In case the URL specified in the cvar is a relative path
+			setTimeout(function(){
+            			window.location.href = `${window.location.origin}/${destination_url}`
+			}, 2500);
         }
     }
 }
