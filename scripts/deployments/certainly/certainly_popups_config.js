@@ -1,3 +1,11 @@
+var style = document.createElement('style');
+	style.innerHTML = `
+	#certainly-popups {
+	width: 230px !important;
+	}
+	`;
+document.head.appendChild(style);
+
 const CERTAINLY_POPUPS = [
     {
         id: "chat_minimized",
